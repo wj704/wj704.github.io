@@ -1,47 +1,66 @@
+(function (doc, win) {
+    var docEl = doc.documentElement,
+        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+        recalc = function () {
+            var clientWidth = docEl.clientWidth;
+            if (!clientWidth) return;
+            if(clientWidth>=640){
+                docEl.style.fontSize = '100px';
+            }else{
+                docEl.style.fontSize = 100 * (clientWidth / 640) + 'px';
+            }
+        };
+
+    if (!doc.addEventListener) return;
+    win.addEventListener(resizeEvt, recalc, false);
+    doc.addEventListener('DOMContentLoaded', recalc, false);
+})(document, window);
+
+
 // 默认开始加载图片
-window.onload = function(){
+window.onload = function() {
 	var imgArray = [];
 	var imgList = {
 			'img': {
-			"img_1":"page1_logo.png",
-			"img_2":"page1_star.png",
-			"img_3":"page1_mid.png",
-			"img_4":"page1_left.png",
-			"img_5":"page1_right.png",
-			"img_6":"page1_footer.png",
-			"img_7":"page1_bg.png"
+				"img_1": "page1_logo.png",
+				"img_2": "page1_star.png",
+				"img_3": "page1_mid.png",
+				"img_4": "page1_left.png",
+				"img_5": "page1_right.png",
+				"img_6": "page1_footer.png",
+				"img_7": "page1_bg.png"
+			}
 		}
-	}
 		// 获得图片的地址
 	for (var i in imgList) {
-		if (typeof(imgList[i]) === "object"){
-			for(var j in imgList[i]){
-				imgArray.push(i + "/" +imgList[i][j]);
+		if (typeof(imgList[i]) === "object") {
+			for (var j in imgList[i]) {
+				imgArray.push(i + "/" + imgList[i][j]);
 			}
 		}
 	}
 
 	var imgNum = imgArray.length;
 	var imgLoaded = 0;
-	for(var i = 0; i < imgNum; i++){
+	for (var i = 0; i < imgNum; i++) {
 		var img = new Image();
 		img.src = imgArray[i];
-		img.onload = function(){
+		img.onload = function() {
 			imgLoaded++;
 			if (imgLoaded === 7) {
 				// 去掉遮罩
 				$('.loading').hide();
-				setTimeout(function () {
-			        $(".img_animate").addClass('img_move');
-			        $(".eagle_img").addClass('eagle_img_move');
-			        $(".page_1_title").addClass('page_1_title_move');
-			        $(".video_link").addClass('video_link_move');
-			        $(".page1_pot_flash").addClass('page1_pot_flash_move');
-			    }, 200);
+				setTimeout(function() {
+					$(".img_animate").addClass('img_move');
+					$(".eagle_img").addClass('eagle_img_move');
+					$(".page_1_title").addClass('page_1_title_move');
+					$(".video_link").addClass('video_link_move');
+					$(".page1_pot_flash").addClass('page1_pot_flash_move');
+				}, 200);
 			}
 		}
-	} 
-	window.Slide && (new window.Slide());	
+	}
+	window.Slide && (new window.Slide());
 }
 
 //阻止上下滚动
@@ -67,7 +86,7 @@ var Slide = function() {
 	this.init();
 }
 
-Slide.prototype =  {
+Slide.prototype = {
 	init: function() {
 		var self = this;
 		this.bindEvent();
@@ -86,50 +105,52 @@ Slide.prototype =  {
 		var onMove = function(e) {
 			var deltaY = e.deltaY;
 			var curIndex = self._curIndex;
-		
+
 			//第一页
-			if(deltaY > 0 &&  curIndex == 0) {
-				return ;
+			if (deltaY > 0 && curIndex == 0) {
+				return;
 			}
-	
+
 			//最后一页
-			if(deltaY < 0 && curIndex == self._slideLen - 1) {
-				return ;
+			if (deltaY < 0 && curIndex == self._slideLen - 1) {
+				return;
 			}
-            //滑动动作
-		    var _distanY = Math.abs(_curY+deltaY);	
+			//滑动动作
+			var _distanY = Math.abs(_curY + deltaY);
 			self.toPosition(_distanY);
 
 		}
 
 		var onEnd = function(e) {
 			var deltaY = e.deltaY;
-			
+
 			//滑动Y轴偏移量少于一定最少距离 ，保留在当前页
-			if(Math.abs(deltaY) < self.minDis) {
-			}else {
-				if(deltaY < 0) {
+			if (Math.abs(deltaY) < self.minDis) {
+				// debugger;
+				self.toNext(e);
+			} else {
+				if (deltaY < 0) {
 					self.toNext(e);
-				}else {
+				} else {
 					self.toPrev();
 				}
 			}
 
-            //停止动作
-		    var _distanY = self.winHeight * (self._curIndex);	
+			//停止动作
+			var _distanY = self.winHeight * (self._curIndex);
 			self.toPosition(_distanY);
 		}
-		
+
 
 		//调用pan拖动,只允许垂直拖动
 		ham.get('pan').set({
 			direction: Hammer.DIRECTION_VERTICAL,
 			threshold: 0,
-		 });
+		});
 
 		ham.on('panstart', function(e) {
 			onStart(e);
-		}); 
+		});
 
 		ham.on('panmove', function(e) {
 			onMove(e);
@@ -138,7 +159,7 @@ Slide.prototype =  {
 
 		ham.on('panend', function(e) {
 			onEnd(e);
-			
+
 		});
 
 		//第四页，弹出遮罩层
@@ -149,7 +170,7 @@ Slide.prototype =  {
 			$('.page4_comment_cover').show();
 		});
 		//第四页，关闭遮罩层
-		this.$wrap.on('click', '.page4_close_btn', function(){
+		this.$wrap.on('click', '.page4_close_btn', function() {
 			$('.page4_comment_cover').hide();
 		});
 	},
@@ -159,28 +180,28 @@ Slide.prototype =  {
 		var deltaY = e.deltaY;
 		this._prevIndex = this._curIndex;
 		var $curPage = this.$slides.eq(this._curIndex);
-	
+
 		this._curIndex++;
 
-		if(this._curIndex > this._slideLen-1) {
-			this._curIndex = this._slideLen-1;
-			return ;
+		if (this._curIndex > this._slideLen - 1) {
+			this._curIndex = this._slideLen - 1;
+			return;
 		}
 	},
 	toPrev: function() {
 		this._prevIndex = this._curIndex;
 		this._curIndex--;
 
-		if(this._curIndex < 0) {
+		if (this._curIndex < 0) {
 			this._curIndex = 0;
-			return ;
+			return;
 		}
 
 	},
 	toPosition: function(_distanY) {
 		var self = this;
 		//进行动画
-		var _v = 'translate3d(0, -'+ _distanY +'px, 0)';
+		var _v = 'translate3d(0, -' + _distanY + 'px, 0)';
 		this.$itemWrap.css({
 			'transform': _v,
 			'-webkit-transform': _v,
@@ -188,8 +209,8 @@ Slide.prototype =  {
 			'-moz-transform': _v,
 		});
 		//第三页，需要画线
-		if(this._curIndex == 2) {
-			setTimeout(function () {
+		if (this._curIndex == 2) {
+			setTimeout(function() {
 				$(".page3_line1_div").addClass('page3_line1_div_move');
 				$(".page3_midstar").addClass('page3_midstar_move');
 				$(".page3_line_div").addClass('page3_line1_div_move');
@@ -208,9 +229,8 @@ Slide.prototype =  {
 				$('.page3_line4_div').addClass('page3_line4_div_move');
 				$('.page3_point4').addClass('page3_point4_move');
 				$('.page3_q').addClass('page3_stamp_move');
-				$('.page3_stamp').addClass('page3_stamp_move');		
+				$('.page3_stamp').addClass('page3_stamp_move');
 			}, 500);
 		}
 	}
 }
-
