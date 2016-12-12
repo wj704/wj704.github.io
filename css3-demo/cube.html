@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>立方体旋转</title>
+    <style>
+      .rect-wrap {
+        position: relative;
+        perspective: 2000px;
+      }
+      .container {
+        width: 400px;
+        height: 400px;
+        transform-style: preserve-3d;
+        transform-origin: 50% 50% 100px;  /* //设置3d空间的原点在平面中心再向Z轴移动100px的位置 */
+        /* left: 50%;
+        margin-left: -200px; */
+        top: 100px;
+      }
+      .slide {
+        width: 200px;
+        height: 200px;
+        position: absolute;
+        background: #000;
+        line-height: 200px;
+        text-align: center;
+        color: #fff;
+        font-size: 30px;
+        font-weight: bold;
+      }
+      .top {
+        left: 100px;
+        top: -100px;
+        transform: rotateX(-90deg);
+        transform-origin: bottom;
+        background: red;
+      }
+      .bottom {
+        left: 100px;
+        bottom: -100px;
+        transform: rotateX(90deg);
+        transform-origin: top;
+        background: grey;
+      }
+      .left {
+        left: -100px;
+        bottom: 100px;
+        transform: rotateY(90deg);
+        transform-origin: right;
+        background: green;
+      }
+      .right {
+        left: 300px;
+        bottom: 100px;
+        transform: rotateY(-90deg);
+        transform-origin: left;
+        background: yellow;
+      }
+      .front {
+        left: 100px;
+        top: 100px;
+        transform: translateZ(200px);
+        background: black;
+      }
+      .back {
+        left: 100px;
+        top: 100px;
+        transform: translateZ(0);;
+        background: blue;
+      }
+      @keyframes rotate-frame {
+        0% {
+            transform: rotateX(0deg) rotateY(0deg);
+        }
+        10% {
+            transform: rotateX(0deg) rotateY(180deg);
+        }
+        20% {
+            transform: rotateX(-180deg) rotateY(180deg);
+        }
+        30% {
+            transform: rotateX(-360deg) rotateY(180deg);
+        }
+        40% {
+            transform: rotateX(-360deg) rotateY(360deg);
+        }
+        50% {
+            transform: rotateX(-180deg) rotateY(360deg);
+        }
+        60% {
+            transform: rotateX(90deg) rotateY(180deg);
+        }
+        70% {
+            transform: rotateX(0) rotateY(180deg);
+        }
+        80% {
+            transform: rotateX(90deg) rotateY(90deg);
+        }
+        90% {
+            transform: rotateX(90deg) rotateY(0);
+        }
+        100% {
+            transform: rotateX(0) rotateY(0);
+        }
+      }
+      .container{
+        animation: rotate-frame 30s linear infinite;
+      }
+    </style>
+</head>
+
+<body class="body">
+  <div class="rect-wrap">   <!-- //舞台元素，设置perspective，让其子元素获得透视效果。 -->
+    <div class="container">    <!-- //容器，设置transform-style: preserve-3d，让其子元素在3D空间呈现 -->
+        <div class="top slide">1</div>   <!-- //立方体的六个面 -->
+        <div class="bottom slide">2</div>
+        <div class="left slide">3</div>
+        <div class="right slide">4</div>
+        <div class="front slide">5</div>
+        <div class="back slide">6</div>
+    </div>
+  </div>
+</body>
+</html>
