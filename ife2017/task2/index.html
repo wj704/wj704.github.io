@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+  <head>
+    <title>task2--图片模糊，文字流光，形状扩展</title>
+  </head>
+  <style>
+    .wrap {
+      width: 690px;
+      height: 517px;
+      position: relative;
+      padding-top: 50px;
+    }
+    .border { 
+      position: relative;
+      width: 590px;
+      height: 417px;
+      margin-left: 50px;
+    }
+
+    /*图片模糊*/
+    .blur { 
+      position: absolute;  
+      transition: all .5s ease;
+    }
+    .wrap:hover .blur {
+      transition: all .5s ease;
+
+      /*filter: url(blur.svg#blur);  FireFox, Chrome, Opera */
+      -webkit-filter: blur(10px); /* Chrome, Opera */
+      -moz-filter: blur(10px);
+      -ms-filter: blur(10px);    
+      filter: blur(10px); 
+      /*filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius=10, MakeShadow=false);  IE6~IE9 */
+    }
+
+    /*形状扩展*/
+    .border::before,.border::after {
+      content:" ";
+      display: block;
+      position: absolute;
+      width: 0;
+      height: 0;  
+      box-sizing: border-box;
+      transition-property: height,width,left,top;
+      transition-duration: 0.5s;
+      transition-timing-function: ease-in;
+    }
+    .border::before {
+      height: 100%;
+      left: 50%;
+    }
+    .wrap:hover > .border::before {
+      left: 0;
+      width: 100%;
+      border: 6px solid #000;
+      border-left-color: transparent;
+      border-right-color: transparent;
+    }
+    .border::after {
+      width: 100%;
+      top: 50%;
+    }
+    .wrap:hover > .border::after {
+      height: 100%;
+      top: 0;
+      border: 4px solid #000;
+      border-top-color: transparent;
+      border-bottom-color: transparent;
+    }
+
+    /*文字流光*/
+    .border  h2, .border a {
+      z-index: 10;
+      transition: all .5s ease-out;
+    }
+    .border h2 {
+      padding-top: 130px;
+      font-size: 40px;
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      z-index: -1;
+    }
+    .border a {
+      text-decoration: none;
+      padding-top: 250px;
+      color: black;
+      font-size: 34px;
+      display: block;
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      left: 0;
+      z-index: -1;
+    }
+    .wrap:hover > .border h2, .wrap:hover > .border a {
+      z-index: 3;
+      transition: all .5s ease-out;
+    }
+    .text-gradient {  
+        display: inline-block;
+        color: black;
+        font-size: 10em;
+        background-image: -webkit-linear-gradient(left, #147B96, #E6D205 25%, #147B96 50%, #E6D205 75%, #147B96);
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        -webkit-background-size: 200% 100%;
+        -webkit-animation: masked-animation 4s infinite linear;
+    }
+    @-webkit-keyframes masked-animation {
+        0%  { background-position: 0 0;}
+        100% { background-position: -100% 0;}
+    }
+
+  </style>
+  <body>
+    <div class="wrap">
+      <img src="timg.png" class="blur"/>
+      <div class="border">
+        <h2 class="text-gradient">You have a new message.</h2>
+        <a class="text-gradient" href="http://ife.baidu.com/course/detail/id/14" target="_blank">Read it !</a>
+      </div>
+    </div>
+  </body>
+</html>
