@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+  <head>
+    <title>task3--Vue(getter,setter)</title>
+  </head>
+  <body>
+
+  </body>
+  <script>
+  
+    function Observer(data) {
+      this.data = data;
+      this.walk(data);
+    }
+    Observer.prototype = {
+      walk: function(obj) {
+        let val;
+        for(let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            val = obj[key];
+            if (typeof val === 'object') {
+              new Observer(val);
+            }
+            this.defineReactive(this.data, key, val);
+          }
+        }
+      },
+      defineReactive: function (obj, key, val) {
+        // var childOb = this.walk(val);
+        var self = this;
+      Object.defineProperty(obj, key, {
+        enumerable: true, // 可枚举
+        configurable: false, // 不能再define
+        get: function() {
+          console.log('你访问了：'+ val);
+          return val;
+        },
+        set: function (newVal) {
+          val = newVal;
+          console.log('你设置了'+key+'新的值为：'+ val);
+        }
+      })
+    }
+    }
+    var app1 = new Observer({
+        name: 'youngwind',
+        age: 25
+    });
+
+    var app2 = new Observer({ 
+        university: 'bupt',
+        major: 'computer'
+    });
+
+    // 要实现的结果如下：
+    app1.data.name; // 你访问了 name
+    document.write('你访问了'+ app1.data.name+'<br/>'); 
+    app1.data.age = 100;  // 你设置了 age，新的值为100
+    app2.data.university; // 你访问了 university
+    document.write('你访问了'+ app2.data.university);
+    app2.data.major = 'science'; // 你设置了 major，新的值为 science
+  </script>
+</html>
