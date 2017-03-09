@@ -29,17 +29,17 @@
           enumerable: true, // 可枚举
           configurable: false, // 不能再define
           get: function() {
-            console.log('你访问了：'+ key);
+            // console.log('你访问了：'+ key);
             return val;
           },
           set: function (newVal) {
+            console.log('你设置了'+key+'新的值为：'+ newVal);
+
             val = newVal;
             // 如果newval是对象的话
             if(typeof newVal === 'object') {
               new Observer(val);
             }
-
-            console.log('你设置了'+key+'新的值为：'+ val);
           }
         });
       }
@@ -63,7 +63,7 @@
     app1.data.name.lastName; // 你访问了 name
     document.write('你访问了'+ app1.data.name.lastName+'<br/>'); 
 
-    // app1.data.name.firstName = 'lalala';
+    app1.data.name.firstName = 'lalala';
 
     // app1.data.age = 100;  // 你设置了 age，新的值为100
     // app2.data.university; // 你访问了 university
