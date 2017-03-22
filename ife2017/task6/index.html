@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+  <head>
+    <title>task4--Vue(Observe)</title>
+  </head>
+  <body>
+
+  </body>
+  <script>
+
+    function Observer(data) {
+      this.data = data;
+      this.walk(data);
+      this.dep = new Dep();
+    }
+    Observer.prototype = {
+      walk: function(obj) {
+        let val;
+        for(let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            val = obj[key];
+            if (typeof val === 'object') { // 属性值也可能是对象
+              new Observer(val);
+            }
+          }
+          this.defineReactive(obj, key, val);
+        }
+      },
+      defineReactive: function (obj, key, val) {
+        var self = this;
+        Object.defineProperty(obj, key, {
+          enumerable: true, // 可枚举
+          configurable: false, // 不能再define
+          get: function() {
+            console.log('你访问了：'+ key);
+            return val;
+          },
+          set: function (newVal) {
+            console.log('你设置了'+key+'新的值为：'+ newVal);
+            val = newVal;
+            self.dep.notify(key, newVal);
+
+            // 如果newval是对象的话
+            if(typeof newVal === 'object') {
+              new Observer(val);
+            }
+          }
+        });
+      },
+      $watch: function(attr, callback) {
+        this.dep.add(attr, callback);
+      }
+    }
+    function Dep() {
+      this.subs = [];
+    }
+    Dep.prototype = {
+      add: function(attr, callback) {
+        if(this.subs[attr]){
+            this.subs[attr].push(callback);
+        }else{
+            this.subs[attr] = [callback];
+        }
+      },
+      notify: function(attr, arg) {
+        this.subs[attr] && this.subs[attr].forEach(function(item){
+          item(arg);
+        });
+      }
+    }
+    var app1 = new Observer({
+        name: 'youngwind',
+        age: 25
+    });
+    var app2 = new Observer({
+        university: 'bupt',
+        major: 'computer'
+    });
+    app1.data.name = {
+         lastName: 'liang',
+         firstName: 'shaofeng'
+    };
+    // 要实现的结果如下：
+    app1.data.name.lastName; // 你访问了 name
+    // document.write('你访问了'+ app1.data.name.lastName+'<br/>');
+    app1.data.name.firstName = 'lalala';
+     // 你需要实现 $watch 这个 API
+    app1.$watch('age', function(age) {
+        console.log('我的年纪变了，现在已经是：'+age+'岁了')
+    });
+    app1.data.age = 100;  // 你设置了 age，新的值为100
+    // app2.data.university; // 你访问了 university
+    // document.write('你访问了'+ app2.data.university);
+    // app2.data.major = 'science'; // 你设置了 major，新的值为 science
+  </script>
+</html>
