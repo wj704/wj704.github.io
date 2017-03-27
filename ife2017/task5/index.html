@@ -12,7 +12,7 @@
       this.dep = new Dep();
     }
     Observer.prototype = {
-      walk: function(obj) {
+      walk: function(obj, path) {
         let val;
         for(let key in obj) {
           if (obj.hasOwnProperty(key)) {
@@ -21,14 +21,28 @@
               new Observer(val);
             }
           }
-          this.defineReactive(obj, key, val);
+          this.defineReactive(obj, key, val, path);
         }
       },
-      defineReactive: function (obj, key, val) {
+      doPath: function(value, path) {
+        if (!value || typeof value != 'object') return
+        if (path) path = path + '.'
+        this.walk(value, path)
+      },
+      defineReactive: function (obj, key, val, path) {
         var self = this;
+        if(!path) {
+          path = key;
+        } else {
+          path = path + key;
+        }
+
+        // bind deeply 递归一次, 绑定
+        self.doPath(val, path);
+
         Object.defineProperty(obj, key, {
           enumerable: true, // 可枚举
-          configurable: false, // 不能再define
+          configurable: true, // 不能再define
           get: function() {
             console.log('你访问了：'+ key);
             return val;
@@ -36,7 +50,7 @@
           set: function (newVal) {
             console.log('你设置了'+key+'新的值为：'+ newVal);
             val = newVal;
-            self.dep.notify(key, newVal);
+            self.dep.notify(path || key);
             // 如果newval是对象的话
             if(typeof newVal === 'object') {
               new Observer(val);
@@ -59,14 +73,27 @@
           this.subs[attr] = [callback];
         }
       },
-      notify: function(attr, arg) {
-        if(this.subs[attr]) { //如果为空就找他的父级看看
-
-        }
-        this.subs[attr] && this.subs[attr].forEach(function(item){
-          item(arg);
+      notify: function(path) {
+        const keys = path.split('.')
+        const depPaths = keys.map((key, index) => {
+          if (index == 0) return key
+          else {
+            let str = ''
+            while (index--) str = keys[index] + '.' + str
+            return str + key
+          }
+        });
+        depPaths.forEach((path) => {
+          const fns = this.subs[path];
+          if (fns && fns.length) {
+            // fns.forEach(fn => fn && fn(this.$getValue(path)))
+            fns.forEach(function(item){
+              item();
+            });
+          }
         });
       },
+
     }
     var app1 = new Observer({
       name: {
