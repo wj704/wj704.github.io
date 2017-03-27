@@ -17,29 +17,24 @@
         for(let key in obj) {
           if (obj.hasOwnProperty(key)) {
             val = obj[key];
+
+            if(!path) {
+              path = key;
+            } else {
+              path = path + key;
+            }
+
             if (typeof val === 'object') { // 属性值也可能是对象
               new Observer(val);
+              if (path) path = path + '.';
+              this.walk(val, path);
             }
           }
           this.defineReactive(obj, key, val, path);
         }
       },
-      doPath: function(value, path) {
-        if (!value || typeof value != 'object') return
-        if (path) path = path + '.'
-        this.walk(value, path)
-      },
       defineReactive: function (obj, key, val, path) {
         var self = this;
-        if(!path) {
-          path = key;
-        } else {
-          path = path + key;
-        }
-
-        // bind deeply 递归一次, 绑定
-        self.doPath(val, path);
-
         Object.defineProperty(obj, key, {
           enumerable: true, // 可枚举
           configurable: true, // 不能再define
@@ -74,26 +69,28 @@
         }
       },
       notify: function(path) {
-        const keys = path.split('.')
+        const keys = path.split('.');
+        var parent = '';
         const depPaths = keys.map((key, index) => {
-          if (index == 0) return key
-          else {
-            let str = ''
-            while (index--) str = keys[index] + '.' + str
-            return str + key
+          if (index == 0) {
+            return key;
+          } else {
+            let str = '';
+            while (index--) {
+              str = keys[index] + '.' + str;
+            }
+            return str + key;
           }
         });
         depPaths.forEach((path) => {
           const fns = this.subs[path];
           if (fns && fns.length) {
-            // fns.forEach(fn => fn && fn(this.$getValue(path)))
-            fns.forEach(function(item){
+            fns.forEach(function(item) {
               item();
             });
           }
         });
       },
-
     }
     var app1 = new Observer({
       name: {
