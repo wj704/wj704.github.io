@@ -1,11 +1,12 @@
 <!DOCTYPE html>
   <head>
+    <meta charset="UTF-8">
     <title>task6--Vue(实现模版渲染，数据绑定)</title>
   </head>
   <body>
     <div id="app">
       <p>姓名：{{user.name}}</p>
-      <p>年龄：{{user.age}}</p>
+      {{user.age}}
     </div>
   </body>
   <script>
@@ -20,13 +21,11 @@
         for(let key in obj) {
           if (obj.hasOwnProperty(key)) {
             val = obj[key];
-
             if(!path) {
               path = key;
             } else {
               path = path + key;
             }
-
             if (typeof val === 'object') { // 属性值也可能是对象
               new Observer(val);
               if (path) path = path + '.';
@@ -42,7 +41,7 @@
           enumerable: true, // 可枚举
           configurable: true, // 不能再define
           get: function() {
-            console.log('你访问了：'+ key);
+            // console.log('你访问了：'+ key);
             return val;
           },
           set: function (newVal) {
@@ -106,7 +105,6 @@
         var self = this;
         var frag = document.createDocumentFragment();
         var child;
-
         while(child = node.firstChild) {
           self.compileElement(child, vm);
           frag.append(child); // 将所有子节点添加到fragment中
@@ -115,11 +113,10 @@
       },
       compileElement: function(node, vm) {
         var reg = /\{\{(.*)\}\}/;
-
         //节点类型为元素
         if(node.nodeType === 1) {
-
           // 处理节点属性
+          // debugger;
           if (node.hasAttributes()) {
               let attrs = node.attributes;
               Array.from(attrs).forEach((attr) => {
@@ -142,20 +139,28 @@
         }
         //节点类型为text
         if(node.nodeType === 3) {
-          let nodeValue = node.nodeValue;
-          if (nodeValue === '' || nodeValue) return;
-          let patt = /{{\w+}}/g;
-          let ret = nodeValue.match(patt);
-          ret.forEach((value) => {
-            let property = value.replace(/[{}]/g, '');
-            nodeValue = nodeValue.replace(value, this.$data[property]);
-          }, this);
-
-          // if(reg.test(node.nodeValue)) {
-          //   var name = RegExp.$1; // 获取匹配到的字符串
-          //   name = name.trim();
-          //   node.nodeValue = vm[name]; // 将data的值赋给该node
-          // }
+        // debugger;
+        //   let nodeValue = node.nodeValue;
+        //   if (nodeValue === "") return;
+        //   let patt = /{{\w+}}/g;
+        //   let ret = nodeValue.match(patt);
+        //   if(ret) {
+        //     ret.forEach((value) => {
+        //       let property = value.replace(/[{}]/g, '');
+        //       debugger;
+        //       nodeValue = nodeValue.replace(value, this.$data[property]);
+        //     }, this);
+        //   }
+          if(reg.test(node.nodeValue)) {
+            let name = RegExp.$1; // 获取匹配到的字符串
+            name = name.trim().split('.');
+            var str = vm.data;
+            for(var i = 0; i<name.length; i++) {
+              // node.nodeValue = vm.data[name[i]]; // 将data的值赋给该node
+              str = str[name[i]];
+            }
+            node.nodeValue = str;
+          }
         }
       },
     }
@@ -177,12 +182,10 @@
     app1.$watch('name', function() {
       console.log('我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。');
     });
-
     app1.data.name.firstName = 'hahaha';
     // 输出：我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。
     app1.data.name.lastName = 'blablabla';
     // 输出：我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。
-
     // app2.data.university; // 你访问了 university
     // document.write('你访问了'+ app2.data.university);
     // app2.data.major = 'science'; // 你设置了 major，新的值为 science
