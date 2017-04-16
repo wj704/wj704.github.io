@@ -6,7 +6,7 @@
   <body>
     <div id="app">
       <p>姓名：{{user.name}}</p>
-      {{user.age}}
+      <p>年龄：{{user.age}}</p>
     </div>
   </body>
   <script>
@@ -97,6 +97,7 @@
     function Compile(node, vm) {
       if(node) {
         this.$frag = this.nodeToFragment(node, vm);
+        this.compileElement(this.$frag, vm);
         return this.$frag;
       }
     }
@@ -106,13 +107,50 @@
         var frag = document.createDocumentFragment();
         var child;
         while(child = node.firstChild) {
-          self.compileElement(child, vm);
-          frag.append(child); // 将所有子节点添加到fragment中
+          // if(self.isIgnorable(child)){
+              // node.removeChild(child);
+          // }else{
+              frag.appendChild(child);
+          // }
+          // self.compileElement(child, vm);
+          // frag.append(child); // 将所有子节点添加到fragment中
         }
         return frag;
       },
+       //判断注释节点以及空格换行等
+      isIgnorable: function(node){
+          let regIgnorable = /^[\t\n\r]+/;
+          return (node.nodeType == 8) || ((node.nodeType == 3) && (regIgnorable.test(node.textContent)));
+      },
       compileElement: function(node, vm) {
         var reg = /\{\{(.*)\}\}/;
+        var that = this;
+        Array.from(node.childNodes).forEach((child) => {
+          if (child.nodeType === 1) {
+              that.compileElement(child,vm);
+          }
+          if (child.nodeType === 3) {
+              // that.compileTextNode(child,that.data);
+              // if(reg.test(node.textContent.trim())) {
+              //   // debugger;
+              //   var name = RegExp.$1; // 获取匹配到的字符串
+              //   name = name.trim().split('.');
+              //   // debugger;
+              //   var str = vm.data;
+              //   for(var i = 0; i<name.length; i++) {
+              //     // node.nodeValue = vm.data[name[i]]; // 将data的值赋给该node
+              //     str = str[name[i]];
+              //   }
+              //   node.nodeValue = str;
+              // }
+
+              let text = node.textContent.trim();
+              let exp = parseTextExp(text,vm.data);
+              node.textContent = exp;
+          }
+
+        });
+        /*
         //节点类型为元素
         if(node.nodeType === 1) {
           // 处理节点属性
@@ -161,9 +199,47 @@
             }
             node.nodeValue = str;
           }
-        }
+          */
+        
       },
     }
+    //data一直传递到此函数，在次函数中将匹配的模版替换(和别人比改成了笨办法把，但是自己理解的比较清除)
+  function parseTextExp(text,data) {
+      let regText = /\{\{(.+?)\}\}/g;
+      let pieces = text.split(regText);
+      let matches = text.match(regText);
+      let result = [];
+      pieces.forEach(function (piece) {
+          if(matches && matches.indexOf('{{' + piece + '}}') > -1){ //包含模版的项
+            let properties = piece.split('.');
+            let datas = data;
+            properties.forEach(function(value){
+              datas = datas[value];
+            });
+            result.push(datas);
+          }else if(piece){ //正常项
+            result.push(piece);
+          }
+      });
+      return result.join('');
+      // if (!exp) {
+      //   return;
+      // }
+      // var regObj = /\{(.+?)\}/g;
+      // var regArr = /\[(.+?)\]/g;
+      // var result = [];
+      // if (regObj.test(exp)) {
+      //   var subExp = exp.replace(/[\s\{\}]/g, '').split(',');
+      //   subExp.forEach(function (sub) {
+      //     var key = '"' + sub.split(':')[0].replace(/['"`]/g, '') + ' "';
+      //     var value = sub.split(':')[1];
+      //     result.push('((' + value + ')?' + key + ':"")')
+      //   });
+      // } else if (regArr.test(exp)) {
+      //   var subExp = exp.replace(/[\s\[\]]/g, '').split(',');
+      // }
+      // return result.join('+');  // 拼成 (a?"acls ":"")+(b?"bcls ":"")的形式
+  }
     var app1 = new Observer({
       name: {
         firstName: 'shaofeng',
