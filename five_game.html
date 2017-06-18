@@ -125,7 +125,6 @@
                 computerWin[i] = 0;
                 _compWin[i] = 0;
             }
-            // debugger;
             var chess = document.getElementById("chess");
             var context = chess.getContext('2d');
 
@@ -143,7 +142,6 @@
             }
             // 我，下棋
             chess.onclick = function(e){
-                // debugger;
                 if(over){
                     return;
                 }
@@ -183,7 +181,6 @@
             }
             // 悔棋
             backbtn.onclick = function(e){
-                // debugger;
                 if(!backAble) { return;}
                 over = false;
                 me = true;
@@ -221,13 +218,11 @@
                 oneStep(_nowi,_nowj,me);                              
                 for(var k = 0; k < count; k++){ 
                     if(wins[_nowi][_nowj][k]){
-                        // debugger;
                         myWin[k]++;
                         _compWin[k] = computerWin[k];
                         computerWin[k] = 6;//这个位置对方不可能赢
                     }
                     if(myWin[k] == 5){
-                        // window.alert('你赢了');
                         resultTxt.innerHTML = '恭喜，你赢了！';
                         over = true;
                     }
@@ -243,13 +238,11 @@
                         myWin[k] = 6;//这个位置对方不可能赢
                     }
                     if(computerWin[k] == 5){
-                        // window.alert('计算机赢了');
-                        // debugger;
                         resultTxt.innerHTML = 'o(╯□╰)o，计算机赢了，继续加油哦！';
                         over = true;
                     }
                 }
-                returnbtn.className += 'unable';
+                returnbtn.className += ' '+ 'unable';
                 returnAble = false;
                 backAble = true;
             }
@@ -319,7 +312,6 @@
                         }
                     }
                 }
-                // debugger;
                 _compi = u;
                 _compj = v;
                 oneStep(u,v,false);
@@ -339,11 +331,14 @@
                     me = !me;
                 }
                 backAble = true;
+                returnAble = false;
+                var hasClass = new RegExp('unable').test(' ' + returnbtn.className + ' ');
+                if(!hasClass) {
+                    returnbtn.className += ' ' + 'unable';
+                }
             }
-
             //绘画棋盘
-            var drawChessBoard = function(){
-                // debugger;
+            var drawChessBoard = function() {
                 for(var i = 0; i < 15; i++){
                     context.moveTo(15 + i * 30 , 15);
                     context.lineTo(15 + i * 30 , 435);
@@ -354,10 +349,9 @@
                 }
             }
             //画棋子
-            var oneStep = function(i,j,me){
-                // debugger;
+            var oneStep = function(i,j,me) {
                 context.beginPath();
-                context.arc(15 + i * 30, 15 + j * 30, 13, 0, 2 * Math.PI);//画圆
+                context.arc(15 + i * 30, 15 + j * 30, 13, 0, 2 * Math.PI);// 画圆
                 context.closePath();
                 //渐变
                 var gradient = context.createRadialGradient(15 + i * 30 + 2, 15 + j * 30 - 2, 13, 15 + i * 30 + 2, 15 + j * 30 - 2, 0);
@@ -373,7 +367,7 @@
                 context.fill();
             }
             //销毁棋子
-             var minusStep = function(i,j) {
+            var minusStep = function(i,j) {
                 //擦除该圆
                 context.clearRect((i) * 30, (j) * 30, 30, 30);
 
@@ -381,13 +375,8 @@
                 context.beginPath();
                 context.moveTo(15+i*30 , j*30);
                 context.lineTo(15+i*30 , j*30 + 30);
-                // context.moveTo(15 + (i-1) * 30 , 15+j*30);
                 context.moveTo(i*30, j*30+15);
                 context.lineTo((i+1)*30 , j*30+15);
-                // context.stroke();
-                
-                // context.moveTo(i*30 , (j-1) * 30);
-                // context.lineTo(i*30 , (j+1) * 30);
     
                 context.stroke();
             }
