@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>拖动</title>
+    <style>
+        h2 {
+            font-size: 20px;
+            color: #0d88c1;
+        }
+
+        div#left,
+        div#right {
+            width: 120px;
+            float: left;
+            margin: 10px 100px 10px 0px;
+            height: 240px;
+            background-color: #dddddd;
+            overflow-y: auto;
+        }
+
+        div label {
+            font-size: 22px;
+            font-weight: bold;
+            width: 100%;
+            display: inline-block;
+            padding: 4px 0;
+            text-align: center;
+            margin: 0px 0 2px 0;
+            color: #fff;
+            background-color: #0d88c1;
+        }
+        .over {
+            border: 1px dashed red;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>拖放（Drag 和 drop）</h2>
+    <!-- 左边元素框 -->
+    <div id="left">
+        <label draggable="true">index1</label>
+        <label draggable="true">index2</label>
+        <label draggable="true">index3</label>
+        <label draggable="true">index4</label>
+        <label draggable="true">index5</label>
+        <label draggable="true">index6</label>
+        <label draggable="true">index7</label>
+    </div>
+    <!-- 右边元素框 -->
+    <div id="right"></div>
+    <script>
+        var moveItem = document.getElementsByTagName('label');
+
+        for (let i = 0; i < moveItem.length; i++) {
+            //动态设置label元素id
+            moveItem[i].setAttribute('id', 'label' + i);
+            moveItem[i].ondragstart = function (ev) {
+                //dataTransfer.setData() 方法设置被拖数据的数据类型和值
+                ev.dataTransfer.setData("id", this.id);
+            };
+        }
+        document.getElementById('right').ondragover = function (ev) {
+            ev.preventDefault(); //阻止向上冒泡
+        }
+        document.getElementById('right').ondragenter = function (ev) {
+            ev.target.classList.add('over')
+        }
+        document.getElementById('right').ondragleave = function (ev) {
+            ev.target.classList.remove('over')
+        }
+        document.getElementById('right').ondrop = function (ev) {
+            ev.preventDefault();
+            ev.target.classList.remove('over')
+            var id = ev.dataTransfer.getData('id');
+            var elem = document.getElementById(id); //当前拖动的元素
+            var toElem = ev.toElement.id; //放置位置
+            if (toElem == 'right') {
+                //如果为container,元素放置在末尾
+                this.appendChild(elem);
+            } else {
+                //如果为container里的元素，则插入该元素之前
+                this.insertBefore(elem, document.getElementById(toElem));
+            }
+        }
+
+        document.getElementById('left').ondragover = function (ev) {
+            ev.preventDefault(); //阻止向上冒泡
+        }
+        document.getElementById('left').ondragenter = function (ev) {
+            ev.target.classList.add('over')
+        }
+        document.getElementById('left').ondragleave = function (ev) {
+            ev.target.classList.remove('over')
+        }
+        document.getElementById('left').ondrop = function (ev) {
+            ev.preventDefault();
+            ev.target.classList.remove('over')
+            var id = ev.dataTransfer.getData('id');
+            var elem = document.getElementById(id);
+            var toElem = ev.toElement.id;
+            if (toElem == 'left') {
+                //如果为container,元素放置在末尾
+                this.appendChild(elem);
+            } else {
+                //如果为container里的元素，则插入该元素之前
+                this.insertBefore(elem, document.getElementById(toElem));
+            }
+        }
+    </script>
+</body>
+
+</html>
